@@ -15,7 +15,6 @@ jobs:
       AWS_REGION: ${{ secrets.AWS_REGION }}
       AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
       BACKEND_IMAGE: ${{ secrets.BACKEND_IMAGE }}
-      FRONTEND_IMAGE: ${{ secrets.FRONTEND_IMAGE }}
       EKS_CLUSTER_NAME: ${{ secrets.EKS_CLUSTER_NAME }}
 
     steps:
@@ -77,27 +76,18 @@ jobs:
       # Build Frontend Docker Image
       # ----------------------------------------------------
 
-      - name: Build Frontend Image
-        run: |
-          docker build \
-          -t maintenance-frontend \
-          ./frontend
 
       # ----------------------------------------------------
       # Tag Frontend Image
       # ----------------------------------------------------
 
-      - name: Tag Frontend Image
-        run: |
-          docker tag maintenance-frontend:latest $FRONTEND_IMAGE
+     
 
       # ----------------------------------------------------
       # Push Frontend Image
       # ----------------------------------------------------
 
-      - name: Push Frontend Image
-        run: |
-          docker push $FRONTEND_IMAGE
+  
 
       # ----------------------------------------------------
       # Configure kubectl
@@ -121,10 +111,7 @@ jobs:
       # Replace Frontend Image
       # ----------------------------------------------------
 
-      - name: Update Frontend Manifest
-        run: |
-          sed -i "s|\${FRONTEND_IMAGE}|$FRONTEND_IMAGE|g" kubernetes/frontend-deployment.yaml
-
+    
       # ----------------------------------------------------
       # Create / Update Kubernetes Secret
       # ----------------------------------------------------
@@ -153,10 +140,7 @@ jobs:
         run: |
           kubectl rollout status deployment/maintenance-backend
 
-      - name: Wait for Frontend
-        run: |
-          kubectl rollout status deployment/maintenance-frontend
-
+      
       # ----------------------------------------------------
       # Verify Pods
       # ----------------------------------------------------
